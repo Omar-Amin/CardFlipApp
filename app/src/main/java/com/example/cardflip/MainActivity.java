@@ -53,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
         visualCards[10] = card11;
 
         for (int i = 0; i < visualCards.length; i++) {
-
             if (rFlip.get(i+1).equals("1")) {
                 visualCards[i].setImageResource(cards.get(i));
 
@@ -65,13 +64,10 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        //TODO: Implement the game. Make sure it is only clickable if it is flipped
-
     }
 
     private void changeCard(View view){
         ImageView imageView = (ImageView) view;
-
 
         for (int i = 0; i < visualCards.length; i++) {
             if(visualCards[i].getId() == view.getId()){
@@ -85,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
                     });
                     rFlip.set(i,"1");
                 }else if(rFlip.get(i).equals("1") && i != 0){ //does the same but checks it neighbours
-                    visualCards[i-1].setImageResource(R.drawable.yellow_back);
+                    visualCards[i-1].setImageResource(R.drawable.greyc2);
                     visualCards[i-1].setOnClickListener(null);
                     rFlip.set(i,"0");
                 }
@@ -98,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
                     });
                     rFlip.set(i+2,"1");
                 } else if (rFlip.get(i+2).equals("1") && i != visualCards.length-1){
-                    visualCards[i+1].setImageResource(R.drawable.yellow_back);
+                    visualCards[i+1].setImageResource(R.drawable.greyc2);
                     visualCards[i+1].setOnClickListener(null);
                     rFlip.set(i+2,"0");
                 }
