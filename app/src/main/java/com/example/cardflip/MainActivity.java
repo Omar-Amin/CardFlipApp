@@ -10,17 +10,23 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class MainActivity extends AppCompatActivity {
 
-    ImageView card1, card2, card3, card4, card5, card6, card7, card8, card9, card10, card11;
-    ImageView[] visualCards = {card1, card2, card3, card4, card5, card6, card7, card8, card9, card10, card11};
-    ArrayList<ColorData> cards;
-    ArrayList<String> rFlip;
-    TextView scoreBoard;
-    TextView gameStatusTV;
-    String gameStatusStr;
-    Button tryAgain;
+    private ImageView card1, card2, card3, card4, card5, card6, card7, card8, card9, card10, card11;
+    private ImageView[] visualCards = {card1, card2, card3, card4, card5, card6, card7, card8, card9, card10, card11};
+    private ArrayList<ColorData> cards;
+    private ArrayList<String> rFlip;
+    private TextView scoreBoard;
+    private TextView gameStatusTV;
+    private TextView bonusScore;
+    private TextView bonusTxt;
+    private Button tryAgain;
+    private Integer bonus = 1;
+    private boolean resetBonus = true;
+
+    private LinkedList<Integer> bonusStatus = new LinkedList<>();
 
     int scoreAdd = 0;
 
@@ -33,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
         gameStatusTV = (TextView) findViewById(R.id.gameStatus);
         tryAgain = (Button) findViewById(R.id.finishButton);
         scoreBoard = (TextView) findViewById(R.id.score);
+        bonusScore = (TextView) findViewById(R.id.bonusTxt);
+        bonusTxt = findViewById(R.id.score2);
 
         card1 = (ImageView) findViewById(R.id.card1);
         card2 = (ImageView) findViewById(R.id.card2);
@@ -59,9 +67,7 @@ public class MainActivity extends AppCompatActivity {
         visualCards[10] = card11;
 
         makeGame();
-
     }
-
 
     private void makeGame(){
         tryAgain.setOnClickListener(null);
@@ -75,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
 
         cards = deck.makeDeck();
 
-
+        //set cards as flipped/not flipped
         for (int i = 0; i < visualCards.length; i++) {
             if (rFlip.get(i+1).equals("1")) {
                 visualCards[i].setImageResource(cards.get(i).getDeckVal());
@@ -91,11 +97,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void changeCard(View view){
         ImageView imageView = (ImageView) view;
-        scoreAdd += 5;
-
         for (int i = 0; i < visualCards.length; i++) {
             //searching for the item
             if(visualCards[i].getId() == view.getId()){
+                bonusStatus.add(cards.get(i).getColors());
+                checkBonus();
+                scoreAdd += 5*bonus;
+
                 scoreBoard.setTextColor(cards.get(i).getColors());
                 scoreBoard.setText(scoreAdd+"");
                 rFlip.set(i+1,"R"); //update it as removed
@@ -131,10 +139,41 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
-        gameStatusStr = checkGame();
+        checkGame();
 
         imageView.setVisibility(View.INVISIBLE);
         imageView.setOnClickListener(null);
+    }
+
+    private void checkBonus(){
+        if(bonusStatus.size() > 1){
+            Integer firstColor = bonusStatus.pollFirst();
+            Integer secondColor = bonusStatus.getFirst();
+            //doubles the bonus each time
+            if(firstColor.equals(secondColor)){
+                bonus *= 2;
+
+                bonusScore.setTextColor(firstColor); //changes colors
+                bonusScore.setText(bonus + "x"); //to indicate which color to press on to get bonus
+                bonusTxt.setTextColor(firstColor);
+
+                resetBonus = true;
+            }else if (bonus > 1 && resetBonus){
+                bonusScore.setTextColor(secondColor);
+                bonusTxt.setTextColor(secondColor);
+                resetBonus = false;
+            }
+            else{
+                bonusScore.setTextColor(secondColor);
+                bonusTxt.setTextColor(secondColor);
+                bonusScore.setText("1x");
+                bonus = 1;
+                resetBonus = true;
+            }
+        }else{
+            bonusScore.setTextColor(bonusStatus.getFirst());
+            bonusTxt.setTextColor(bonusStatus.getFirst());
+        }
     }
 
     String checkGame(){
@@ -162,24 +201,29 @@ public class MainActivity extends AppCompatActivity {
                 return "lost";
             }
         }
+
         tryAgain.setTextColor(Color.parseColor("#2d9604"));
         gameStatusTV.setText("You won!!!");
         gameStatusTV.setTextColor(Color.parseColor("#2d9604"));
         gameStatusTV.setVisibility(View.VISIBLE);
         tryAgain.setVisibility(View.VISIBLE);
-        return "won";
 
+        return "won";
     }
 
     private void resetGame(){
-
         for (ImageView visualCard : visualCards) {
             visualCard.setVisibility(View.VISIBLE);
             visualCard.setImageResource(R.drawable.greyc2);
         }
+        bonus = 1;
+        bonusScore.setText("1x");
+        bonusStatus.clear();
+        resetBonus = true;
         scoreBoard.setText("0");
         scoreAdd = 0;
-
     }
+
+
 
 }
