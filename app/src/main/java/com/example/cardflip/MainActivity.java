@@ -1,5 +1,8 @@
 package com.example.cardflip;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
@@ -8,7 +11,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -25,34 +27,45 @@ public class MainActivity extends AppCompatActivity {
     private Button tryAgain;
     private Integer bonus = 1;
     private boolean resetBonus = true;
+    private SharedPreferences prefs;
+    private TextView highscore;
+    private TextView highscoreTxt;
 
     private LinkedList<Integer> bonusStatus = new LinkedList<>();
 
-    int scoreAdd = 0;
+    private int scoreAdd = 0;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
-        gameStatusTV = (TextView) findViewById(R.id.gameStatus);
-        tryAgain = (Button) findViewById(R.id.finishButton);
-        scoreBoard = (TextView) findViewById(R.id.score);
-        bonusScore = (TextView) findViewById(R.id.bonusTxt);
-        bonusTxt = findViewById(R.id.score2);
+        //setting up the highscore
+        highscore = findViewById(R.id.highscoreVal);
+        prefs = this.getSharedPreferences("highscore",Context.MODE_PRIVATE);
+        int score = prefs.getInt("highscoreValue",0);
+        highscore.setText(score + "");
 
-        card1 = (ImageView) findViewById(R.id.card1);
-        card2 = (ImageView) findViewById(R.id.card2);
-        card3 = (ImageView) findViewById(R.id.card3);
-        card4 = (ImageView) findViewById(R.id.card4);
-        card5 = (ImageView) findViewById(R.id.card5);
-        card6 = (ImageView) findViewById(R.id.card6);
-        card7 = (ImageView) findViewById(R.id.card7);
-        card8 = (ImageView) findViewById(R.id.card8);
-        card9 = (ImageView) findViewById(R.id.card9);
-        card10 = (ImageView) findViewById(R.id.card10);
-        card11 = (ImageView) findViewById(R.id.card11);
+        gameStatusTV = findViewById(R.id.gameStatus);
+        tryAgain = findViewById(R.id.finishButton);
+        scoreBoard = findViewById(R.id.score);
+        bonusScore = findViewById(R.id.bonusTxt);
+        bonusTxt = findViewById(R.id.score2);
+        highscoreTxt = findViewById(R.id.highscoreTxt);
+
+        card1 = findViewById(R.id.card1);
+        card2 = findViewById(R.id.card2);
+        card3 = findViewById(R.id.card3);
+        card4 = findViewById(R.id.card4);
+        card5 = findViewById(R.id.card5);
+        card6 = findViewById(R.id.card6);
+        card7 = findViewById(R.id.card7);
+        card8 = findViewById(R.id.card8);
+        card9 = findViewById(R.id.card9);
+        card10 = findViewById(R.id.card10);
+        card11 = findViewById(R.id.card11);
 
         visualCards[0] = card1;
         visualCards[1] = card2;
@@ -95,17 +108,26 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private void changeCard(View view){
         ImageView imageView = (ImageView) view;
         for (int i = 0; i < visualCards.length; i++) {
             //searching for the item
             if(visualCards[i].getId() == view.getId()){
-                bonusStatus.add(cards.get(i).getColors());
+                int cardColor = cards.get(i).getColors();
+                bonusStatus.add(cardColor);
                 checkBonus();
+                //setting the scoreboard
                 scoreAdd += 5*bonus;
-
-                scoreBoard.setTextColor(cards.get(i).getColors());
+                scoreBoard.setTextColor(cardColor);
                 scoreBoard.setText(scoreAdd+"");
+                //change color of highscore
+                highscore.setTextColor(cardColor);
+                highscoreTxt.setTextColor(cardColor);
+                //change color of "try again" "you won" etc.
+                gameStatusTV.setTextColor(cardColor);
+                tryAgain.setTextColor(cardColor);
+
                 rFlip.set(i+1,"R"); //update it as removed
 
                 //add/remove eventlistener and flip the left card, update rFlip
@@ -145,6 +167,7 @@ public class MainActivity extends AppCompatActivity {
         imageView.setOnClickListener(null);
     }
 
+    @SuppressLint("SetTextI18n")
     private void checkBonus(){
         if(bonusStatus.size() > 1){
             Integer firstColor = bonusStatus.pollFirst();
@@ -152,17 +175,16 @@ public class MainActivity extends AppCompatActivity {
             //doubles the bonus each time
             if(firstColor.equals(secondColor)){
                 bonus *= 2;
-
                 bonusScore.setTextColor(firstColor); //changes colors
                 bonusScore.setText(bonus + "x"); //to indicate which color to press on to get bonus
                 bonusTxt.setTextColor(firstColor);
 
-                resetBonus = true;
+                resetBonus = true; //resetBonus to give the player a chance to keep his bonus
             }else if (bonus > 1 && resetBonus){
                 bonusScore.setTextColor(secondColor);
                 bonusTxt.setTextColor(secondColor);
-                resetBonus = false;
-            }
+                resetBonus = false; //setting to false, so next time the player chooses a color that is not similar
+            }                       //the bonus score reset
             else{
                 bonusScore.setTextColor(secondColor);
                 bonusTxt.setTextColor(secondColor);
@@ -176,13 +198,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    String checkGame(){
+    @SuppressLint("SetTextI18n")
+    void checkGame(){
         for (int i = 1; i < rFlip.size()-1; i++) {
             if (rFlip.get(i).equals("1")){
-                return "still";
+                return;
             }
         }
-
         tryAgain.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -193,24 +215,36 @@ public class MainActivity extends AppCompatActivity {
 
         for (int i = 1; i < rFlip.size()-1; i++) {
             if (rFlip.get(i).equals("0")){
-                tryAgain.setTextColor(Color.RED);
                 gameStatusTV.setText("You lost...");
-                gameStatusTV.setTextColor(Color.RED);
                 gameStatusTV.setVisibility(View.VISIBLE);
                 tryAgain.setVisibility(View.VISIBLE);
-                return "lost";
+                setHighscore();
+                return;
             }
         }
 
-        tryAgain.setTextColor(Color.parseColor("#2d9604"));
+        setHighscore();
         gameStatusTV.setText("You won!!!");
-        gameStatusTV.setTextColor(Color.parseColor("#2d9604"));
         gameStatusTV.setVisibility(View.VISIBLE);
         tryAgain.setVisibility(View.VISIBLE);
 
-        return "won";
     }
 
+    @SuppressLint("SetTextI18n")
+    private void setHighscore(){
+        prefs = this.getSharedPreferences("highscore",Context.MODE_PRIVATE);
+        int score = prefs.getInt("highscoreValue",0);
+
+        System.out.println(score);
+        if(score < scoreAdd ){
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putInt("highscoreValue",scoreAdd);
+            editor.apply();
+            highscore.setText(scoreAdd + "");
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
     private void resetGame(){
         for (ImageView visualCard : visualCards) {
             visualCard.setVisibility(View.VISIBLE);
@@ -222,8 +256,13 @@ public class MainActivity extends AppCompatActivity {
         resetBonus = true;
         scoreBoard.setText("0");
         scoreAdd = 0;
+
+        int color = Color.parseColor("#5F5F5D");
+        bonusTxt.setTextColor(color);
+        scoreBoard.setTextColor(color);
+        bonusScore.setTextColor(color);
+        highscoreTxt.setTextColor(color);
+        highscore.setTextColor(color);
     }
-
-
 
 }
