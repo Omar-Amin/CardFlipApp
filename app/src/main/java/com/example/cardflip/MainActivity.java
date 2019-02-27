@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
+import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -12,6 +13,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 
 public class MainActivity extends AppCompatActivity {
@@ -24,15 +26,17 @@ public class MainActivity extends AppCompatActivity {
     private TextView gameStatusTV;
     private TextView bonusScore;
     private TextView bonusTxt;
-    private Button tryAgain;
-    private Integer bonus = 1;
-    private boolean resetBonus = true;
-    private SharedPreferences prefs;
     private TextView highscore;
     private TextView highscoreTxt;
 
+    private Button tryAgain;
+    private boolean resetBonus = true;
+    private SharedPreferences prefs;
+    private TimeCounter timeCounter;
+
     private LinkedList<Integer> bonusStatus = new LinkedList<>();
 
+    private Integer bonus = 1;
     private int scoreAdd = 0;
 
     @SuppressLint("SetTextI18n")
@@ -42,7 +46,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
-        //setting up the highscore
+        //setting up the highscore and deck
+        Deck deck = new Deck();
+        cards = deck.makeDeck();
         highscore = findViewById(R.id.highscoreVal);
         prefs = this.getSharedPreferences("highscore",Context.MODE_PRIVATE);
         int score = prefs.getInt("highscoreValue",0);
@@ -79,20 +85,37 @@ public class MainActivity extends AppCompatActivity {
         visualCards[9] = card10;
         visualCards[10] = card11;
 
-        makeGame();
+        tryAgain.setText("Start");
+
+        tryAgain.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                timeCounter =  new TimeCounter(30*1000,1000);
+                timeCounter.start();
+                makeGame();
+            }
+        });
     }
 
+    @SuppressLint("SetTextI18n")
     private void makeGame(){
-        tryAgain.setOnClickListener(null);
-        tryAgain.setVisibility(View.INVISIBLE);
-        gameStatusTV.setVisibility(View.INVISIBLE);
+        Collections.shuffle(cards);
+        tryAgain.setText("Stop");
+        tryAgain.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                for (ImageView visualCard : visualCards) {
+                    visualCard.setImageResource(R.drawable.greyc2);
+                    visualCard.setOnClickListener(null);
+                }
+                resetCards();
+                timeCounter.cancel();
+            }
+        });
 
-        Deck deck = new Deck();
         RandomFlip randomFlip = new RandomFlip(11);
 
         rFlip = randomFlip.randomize();
-
-        cards = deck.makeDeck();
 
         //set cards as flipped/not flipped
         for (int i = 0; i < visualCards.length; i++) {
@@ -118,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
                 bonusStatus.add(cardColor);
                 checkBonus();
                 //setting the scoreboard
-                scoreAdd += 5*bonus;
+                scoreAdd += 2*bonus;
                 scoreBoard.setTextColor(cardColor);
                 scoreBoard.setText(scoreAdd+"");
                 //change color of highscore
@@ -129,7 +152,6 @@ public class MainActivity extends AppCompatActivity {
                 tryAgain.setTextColor(cardColor);
 
                 rFlip.set(i+1,"R"); //update it as removed
-
                 //add/remove eventlistener and flip the left card, update rFlip
                 if(rFlip.get(i).equals("0") && i != 0){
                     visualCards[i-1].setImageResource(cards.get(i-1).getDeckVal());
@@ -161,10 +183,9 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
-        checkGame();
-
         imageView.setVisibility(View.INVISIBLE);
         imageView.setOnClickListener(null);
+        checkGame();
     }
 
     @SuppressLint("SetTextI18n")
@@ -174,11 +195,12 @@ public class MainActivity extends AppCompatActivity {
             Integer secondColor = bonusStatus.getFirst();
             //doubles the bonus each time
             if(firstColor.equals(secondColor)){
-                bonus *= 2;
+                if(bonus < 9000000){
+                    bonus *= 5;
+                }
                 bonusScore.setTextColor(firstColor); //changes colors
                 bonusScore.setText(bonus + "x"); //to indicate which color to press on to get bonus
                 bonusTxt.setTextColor(firstColor);
-
                 resetBonus = true; //resetBonus to give the player a chance to keep his bonus
             }else if (bonus > 1 && resetBonus){
                 bonusScore.setTextColor(secondColor);
@@ -205,29 +227,22 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
         }
-        tryAgain.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                resetGame();
-                makeGame();
-            }
-        });
 
         for (int i = 1; i < rFlip.size()-1; i++) {
             if (rFlip.get(i).equals("0")){
+                timeCounter.cancel();
+                resetCards();
                 gameStatusTV.setText("You lost...");
-                gameStatusTV.setVisibility(View.VISIBLE);
-                tryAgain.setVisibility(View.VISIBLE);
-                setHighscore();
                 return;
             }
         }
+        //Adding more time when clearing the game
+        String tmp = gameStatusTV.getText().toString();
+        timeCounter.cancel();
+        timeCounter = new TimeCounter((5+Integer.parseInt(tmp))*1000 ,1000);
+        timeCounter.start();
 
-        setHighscore();
-        gameStatusTV.setText("You won!!!");
-        gameStatusTV.setVisibility(View.VISIBLE);
-        tryAgain.setVisibility(View.VISIBLE);
-
+        resetGame();
     }
 
     @SuppressLint("SetTextI18n")
@@ -250,11 +265,18 @@ public class MainActivity extends AppCompatActivity {
             visualCard.setVisibility(View.VISIBLE);
             visualCard.setImageResource(R.drawable.greyc2);
         }
+
+        makeGame();
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void resetCards(){
+        setHighscore();
         bonus = 1;
         bonusScore.setText("1x");
         bonusStatus.clear();
         resetBonus = true;
-        scoreBoard.setText("0");
+        gameStatusTV.setText("30");
         scoreAdd = 0;
 
         int color = Color.parseColor("#5F5F5D");
@@ -263,6 +285,44 @@ public class MainActivity extends AppCompatActivity {
         bonusScore.setTextColor(color);
         highscoreTxt.setTextColor(color);
         highscore.setTextColor(color);
+        tryAgain.setTextColor(color);
+        gameStatusTV.setTextColor(color);
+
+        tryAgain.setText("Start");
+        tryAgain.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                scoreBoard.setText("0");
+                timeCounter =  new TimeCounter(30*1000,1000);
+                resetGame();
+                timeCounter.start();
+            }
+        });
+    }
+
+    private class TimeCounter extends CountDownTimer { //class to set timer
+
+        private TimeCounter(long millisInFuture, long countDownInterval) {
+            super(millisInFuture, countDownInterval);
+        }
+
+        @SuppressLint("SetTextI18n")
+        @Override
+        public void onTick(long l) {
+            gameStatusTV.setText(l/1000 + "");
+        }
+
+        @SuppressLint("SetTextI18n")
+        @Override
+        public void onFinish() {
+            //when the game is finished, and you haven't lost, set remaining cards to null and reset
+            gameStatusTV.setText("Times over!");
+            for (ImageView visualCard : visualCards) {
+                visualCard.setOnClickListener(null);
+            }
+
+            resetCards();
+        }
     }
 
 }
