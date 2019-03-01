@@ -25,5 +25,4 @@ class Deck {
         return deck;
     }
 
-
 }

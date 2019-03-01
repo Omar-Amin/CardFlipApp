@@ -1,3 +1,25 @@
 <resources>
     <string name="app_name">CardFlip</string>
+    <string name="_1x">1x</string>
+    <string name="highscore">Highscore</string>
+    <string name="highscorezero">0</string>
+    <string name="bonus">Bonus</string>
+    <string name="card1">TODO</string>
+    <string name="card2">TODO</string>
+    <string name="card3">TODO</string>
+    <string name="try_again">Try again!</string>
+    <string name="_0">0</string>
+    <string name="_30">30</string>
+    <string name="card4">TODO</string>
+    <string name="card5">TODO</string>
+    <string name="card6">TODO</string>
+    <string name="card7">TODO</string>
+    <string name="card8">TODO</string>
+    <string name="card9">TODO</string>
+    <string name="card10">TODO</string>
+    <string name="card11">TODO</string>
+    <string name="todo">TODO</string>
+    <string name="play">Play</string>
+    <string name="gamemode1">Gamemode1</string>
+    <string name="gamemode2">Gamemode2</string>
 </resources>

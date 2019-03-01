@@ -2,6 +2,7 @@ package com.example.cardflip;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
@@ -18,8 +19,7 @@ import java.util.LinkedList;
 
 public class GameActivity extends AppCompatActivity {
 
-    private ImageView card1, card2, card3, card4, card5, card6, card7, card8, card9, card10, card11;
-    private ImageView[] visualCards = {card1, card2, card3, card4, card5, card6, card7, card8, card9, card10, card11};
+    private ImageView[] visualCards = new ImageView[11];
     private ArrayList<ColorData> cards;
     private ArrayList<String> rFlip;
     private TextView scoreBoard;
@@ -28,6 +28,8 @@ public class GameActivity extends AppCompatActivity {
     private TextView bonusTxt;
     private TextView highscore;
     private TextView highscoreTxt;
+    private String prefsKey;
+    private String scoreKey;
 
     private Button tryAgain;
     private boolean resetBonus = true;
@@ -46,32 +48,19 @@ public class GameActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
-        //setting up the highscore and deck
-        Deck deck = new Deck();
-        cards = deck.makeDeck();
-        highscore = findViewById(R.id.highscoreVal);
-        prefs = this.getSharedPreferences("highscore",Context.MODE_PRIVATE);
-        int score = prefs.getInt("highscoreValue",0);
-        highscore.setText(score + "");
-
-        gameStatusTV = findViewById(R.id.gameStatus);
+        ImageView card1 = findViewById(R.id.card1);
+        ImageView card2 = findViewById(R.id.card2);
+        ImageView card3 = findViewById(R.id.card3);
+        ImageView card4 = findViewById(R.id.card4);
+        ImageView card5 = findViewById(R.id.card5);
+        ImageView card6 = findViewById(R.id.card6);
+        ImageView card7 = findViewById(R.id.card7);
+        ImageView card8 = findViewById(R.id.card8);
+        ImageView card9 = findViewById(R.id.card9);
+        ImageView card10 = findViewById(R.id.card10);
+        ImageView card11 = findViewById(R.id.card11);
+        ImageView backButton = findViewById(R.id.backButton);
         tryAgain = findViewById(R.id.finishButton);
-        scoreBoard = findViewById(R.id.score);
-        bonusScore = findViewById(R.id.bonusTxt);
-        bonusTxt = findViewById(R.id.score2);
-        highscoreTxt = findViewById(R.id.highscoreTxt);
-
-        card1 = findViewById(R.id.card1);
-        card2 = findViewById(R.id.card2);
-        card3 = findViewById(R.id.card3);
-        card4 = findViewById(R.id.card4);
-        card5 = findViewById(R.id.card5);
-        card6 = findViewById(R.id.card6);
-        card7 = findViewById(R.id.card7);
-        card8 = findViewById(R.id.card8);
-        card9 = findViewById(R.id.card9);
-        card10 = findViewById(R.id.card10);
-        card11 = findViewById(R.id.card11);
 
         visualCards[0] = card1;
         visualCards[1] = card2;
@@ -85,6 +74,19 @@ public class GameActivity extends AppCompatActivity {
         visualCards[9] = card10;
         visualCards[10] = card11;
 
+        bonusScore = findViewById(R.id.bonusTxt);
+        bonusTxt = findViewById(R.id.score2);
+
+
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setHighscore();
+                startActivity(new Intent(GameActivity.this,GameMode.class));
+
+            }
+        });
+
         tryAgain.setText("Start");
 
         tryAgain.setOnClickListener(new View.OnClickListener(){
@@ -95,6 +97,56 @@ public class GameActivity extends AppCompatActivity {
                 makeGame();
             }
         });
+
+        Intent intent = getIntent();
+        int gameMode = intent.getIntExtra("gameMode",1);
+
+        if (gameMode == 1){
+            initializeGameMode1();
+        }else {
+
+            initializeGameMode2();
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void initializeGameMode1(){
+        //setting up the highscore and deck
+        Deck deck = new Deck();
+        cards = deck.makeDeck();
+        highscore = findViewById(R.id.highscoreVal);
+        prefs = this.getSharedPreferences("highscore",Context.MODE_PRIVATE);
+        int score = prefs.getInt("highscoreValue",0);
+        highscore.setText(score + "");
+        prefsKey = "highscore";
+        scoreKey = "highscoreValue";
+
+        bonusScore.setVisibility(View.VISIBLE);
+        bonusTxt.setVisibility(View.VISIBLE);
+        gameStatusTV = findViewById(R.id.gameStatus);
+        scoreBoard = findViewById(R.id.score);
+        highscoreTxt = findViewById(R.id.highscoreTxt);
+
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void initializeGameMode2(){
+        //setting up the highscore and deck
+        Deck deck = new Deck();
+        cards = deck.makeDeck();
+        highscore = findViewById(R.id.highscoreVal);
+        prefs = this.getSharedPreferences("highscoreCards",Context.MODE_PRIVATE);
+        int score = prefs.getInt("highscoreValueCards",0);
+        highscore.setText(score + "");
+        prefsKey = "highscoreCards";
+        scoreKey = "highscoreValueCards";
+
+        gameStatusTV = findViewById(R.id.gameStatus);
+        tryAgain = findViewById(R.id.finishButton);
+        scoreBoard = findViewById(R.id.score);
+        bonusScore.setVisibility(View.INVISIBLE);
+        bonusTxt.setVisibility(View.INVISIBLE);
+        highscoreTxt = findViewById(R.id.highscoreTxt);
     }
 
     @SuppressLint("SetTextI18n")
@@ -139,11 +191,16 @@ public class GameActivity extends AppCompatActivity {
             if(visualCards[i].getId() == view.getId()){
                 int cardColor = cards.get(i).getColors();
                 bonusStatus.add(cardColor);
-                checkBonus();
-                //setting the scoreboard
-                scoreAdd += 2*bonus;
+                if(prefsKey.equals("highscore")){
+                    checkBonus();
+                    //setting the scoreboard
+                    scoreAdd += 2*bonus;
+                }else {
+                    scoreAdd += 1;
+                }
                 scoreBoard.setTextColor(cardColor);
                 scoreBoard.setText(scoreAdd+"");
+
                 //change color of highscore
                 highscore.setTextColor(cardColor);
                 highscoreTxt.setTextColor(cardColor);
@@ -236,24 +293,26 @@ public class GameActivity extends AppCompatActivity {
                 return;
             }
         }
-        //Adding more time when clearing the game
-        String tmp = gameStatusTV.getText().toString();
-        timeCounter.cancel();
-        timeCounter = new TimeCounter((5+Integer.parseInt(tmp))*1000 ,1000);
-        timeCounter.start();
+        if(prefsKey.equals("highscore")){
+            //Adding more time when clearing the game
+            String tmp = gameStatusTV.getText().toString();
+            timeCounter.cancel();
+            timeCounter = new TimeCounter((5+Integer.parseInt(tmp))*1000 ,1000);
+            timeCounter.start();
+        }
 
         resetGame();
     }
 
     @SuppressLint("SetTextI18n")
     private void setHighscore(){
-        prefs = this.getSharedPreferences("highscore",Context.MODE_PRIVATE);
-        int score = prefs.getInt("highscoreValue",0);
+        prefs = this.getSharedPreferences(prefsKey,Context.MODE_PRIVATE);
+        int score = prefs.getInt(scoreKey,0);
 
         System.out.println(score);
         if(score < scoreAdd ){
             SharedPreferences.Editor editor = prefs.edit();
-            editor.putInt("highscoreValue",scoreAdd);
+            editor.putInt(scoreKey,scoreAdd);
             editor.apply();
             highscore.setText(scoreAdd + "");
         }
