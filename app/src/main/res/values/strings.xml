@@ -22,4 +22,6 @@
     <string name="play">Play</string>
     <string name="gamemode1">Gamemode1</string>
     <string name="gamemode2">Gamemode2</string>
+    <string name="combo">Combo</string>
+    <string name="speed">Speed</string>
 </resources>

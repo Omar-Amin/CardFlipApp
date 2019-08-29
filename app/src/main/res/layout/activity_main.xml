@@ -6,89 +6,109 @@
     android:layout_height="match_parent"
     tools:context=".GameActivity">
 
-    <TextView
-        android:id="@+id/highscoreTxt"
-        android:layout_width="186dp"
-        android:layout_height="39dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:gravity="right"
-        android:text="@string/highscore"
-        android:textAllCaps="false"
-        android:textColor="@color/greyc2"
-        android:textSize="30sp"
-        app:fontFamily="sans-serif-black"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.835"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.303" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="25dp"
+        app:layout_constraintBottom_toTopOf="@id/linearLayout"
+        app:layout_constraintTop_toTopOf="parent">
 
-    <TextView
-        android:id="@+id/highscoreVal"
-        android:layout_width="139dp"
-        android:layout_height="45dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:gravity="center"
-        android:text="@string/highscorezero"
-        android:textAllCaps="false"
-        android:textColor="@color/greyc2"
-        android:textSize="24sp"
-        app:fontFamily="sans-serif-black"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.848"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.962" />
+        <TextView
+            android:id="@+id/highscoreTxt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:gravity="right"
+            android:text="@string/highscore"
+            android:textAllCaps="false"
+            android:textColor="@color/greyc2"
+            android:textSize="30sp"
+            app:fontFamily="sans-serif-black"
+            android:layout_alignParentRight="true"/>
 
-    <TextView
-        android:id="@+id/bonusTxt"
-        android:layout_width="186dp"
-        android:layout_height="45dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:gravity="center"
-        android:text="@string/_1x"
-        android:textAllCaps="false"
-        android:textColor="@color/greyc2"
-        android:textSize="24sp"
-        app:fontFamily="sans-serif-black"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.164"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
+        <TextView
+            android:id="@+id/highscoreVal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/highscorezero"
+            android:textAllCaps="false"
+            android:textColor="@color/greyc2"
+            android:textSize="24sp"
+            app:fontFamily="sans-serif-black"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/highscoreTxt"
+            android:layout_alignParentEnd="true" />
 
-    <TextView
-        android:id="@+id/score2"
-        android:layout_width="186dp"
-        android:layout_height="58dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:gravity="center"
-        android:text="@string/bonus"
-        android:textAllCaps="false"
-        android:textColor="@color/greyc2"
-        android:textSize="30sp"
-        app:fontFamily="sans-serif-black"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.164"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.303" />
+        <TextView
+            android:id="@+id/bonusTxt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="@string/_1x"
+            android:textAllCaps="false"
+            android:textColor="@color/greyc2"
+            app:fontFamily="sans-serif-black"
+            android:textSize="24sp"
+            android:layout_below="@id/score2"/>
+
+        <TextView
+            android:id="@+id/score2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:gravity="center"
+            android:text="@string/bonus"
+            android:textAllCaps="false"
+            android:textColor="@color/greyc2"
+            android:textSize="30sp"
+            app:fontFamily="sans-serif-black"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true" />
+
+        <TextView
+            android:id="@+id/score"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:gravity="center"
+            android:text="@string/_0"
+            android:textAllCaps="false"
+            android:textColor="@color/greyc2"
+            android:textSize="30sp"
+            app:fontFamily="sans-serif-black"
+            android:layout_centerInParent="true"
+            android:layout_alignParentTop="true"/>
+
+        <TextView
+            android:id="@+id/gameStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:text="@string/_30"
+            android:textColor="@color/greyc2"
+            android:textSize="24sp"
+            app:fontFamily="sans-serif-black"
+            android:layout_below="@id/score"
+            android:layout_centerInParent="true" />
+    </RelativeLayout>
+
 
     <LinearLayout
         android:id="@+id/linearLayout"
-        android:layout_width="685dp"
-        android:layout_height="131dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="32dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginBottom="8dp"
@@ -209,43 +229,7 @@
             tools:layout_editor_absoluteY="50dp" />
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/score"
-        android:layout_width="186dp"
-        android:layout_height="58dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:gravity="center"
-        android:text="@string/_0"
-        android:textAllCaps="false"
-        android:textColor="@color/greyc2"
-        android:textSize="30sp"
-        app:fontFamily="sans-serif-black"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.499"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.303" />
 
-    <TextView
-        android:id="@+id/gameStatus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginBottom="8dp"
-        android:text="@string/_30"
-        android:textColor="@color/greyc2"
-        android:textSize="24sp"
-        app:fontFamily="sans-serif-black"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/score" />
 
     <Button
         android:id="@+id/finishButton"
@@ -268,23 +252,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
 
-    <ImageView
-        android:id="@+id/backButton"
-        android:layout_width="31dp"
-        android:layout_height="46dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/score2"
-        app:layout_constraintHorizontal_bias="0.74"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.091"
-        app:srcCompat="@drawable/backbutton"
-        android:contentDescription="@string/todo" />
+
 
 </android.support.constraint.ConstraintLayout>
